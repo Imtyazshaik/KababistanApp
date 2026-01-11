@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "903483765578",
+    "project_id": "kababistan-145ae",
+    "storage_bucket": "kababistan-145ae.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:903483765578:android:a051c43dbfb82ffd9207b3",
+        "android_client_info": {
+          "package_name": "com.example.kababistanadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "903483765578-117kkr299g3eike4chqfgubis5v75u1t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBR0PG8IGUOr4X-z88o4F3GxWjeMyyWn_w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "903483765578-117kkr299g3eike4chqfgubis5v75u1t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:903483765578:android:21067f6c46263d989207b3",
+        "android_client_info": {
+          "package_name": "com.example.kababistanapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "903483765578-117kkr299g3eike4chqfgubis5v75u1t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBR0PG8IGUOr4X-z88o4F3GxWjeMyyWn_w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "903483765578-117kkr299g3eike4chqfgubis5v75u1t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

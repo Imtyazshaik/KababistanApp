@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id" translatable="false">903483765578-117kkr299g3eike4chqfgubis5v75u1t.apps.googleusercontent.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">903483765578</string>
+    <string name="google_api_key" translatable="false">AIzaSyBR0PG8IGUOr4X-z88o4F3GxWjeMyyWn_w</string>
+    <string name="google_app_id" translatable="false">1:903483765578:android:a051c43dbfb82ffd9207b3</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyBR0PG8IGUOr4X-z88o4F3GxWjeMyyWn_w</string>
+    <string name="google_storage_bucket" translatable="false">kababistan-145ae.firebasestorage.app</string>
+    <string name="project_id" translatable="false">kababistan-145ae</string>
+    <style name="Theme.KababistanAdmin" parent="android:Theme.Material.Light.NoActionBar"/>
+</resources>
