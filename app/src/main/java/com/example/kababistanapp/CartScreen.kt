@@ -1,10 +1,6 @@
 package com.example.kababistanapp
 
-import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -38,8 +35,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.kababistanapp.model.CartItem as OrderCartItem
 import com.example.kababistanapp.ui.theme.PrimaryColor
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -68,9 +69,37 @@ fun CartScreen(navController: NavController, cartViewModel: CartViewModel = view
 
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
+    var showClosedDialog by remember { mutableStateOf(false) }
     
     val datePickerState = rememberDatePickerState()
     val timePickerState = rememberTimePickerState(is24Hour = false)
+
+    LaunchedEffect(Unit) {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null && (customerName.isBlank() || customerEmail.isBlank() || customerPhone.isBlank())) {
+            FirebaseFirestore.getInstance().collection("users").document(user.uid).get()
+                .addOnSuccessListener { doc ->
+                    if (doc.exists()) {
+                        if (customerName.isBlank()) cartViewModel.customerName.value = doc.getString("name") ?: ""
+                        if (customerEmail.isBlank()) cartViewModel.customerEmail.value = doc.getString("email") ?: ""
+                        if (customerPhone.isBlank()) cartViewModel.customerPhone.value = doc.getString("phone") ?: ""
+                    }
+                }
+        }
+    }
+
+    if (showClosedDialog) {
+        AlertDialog(
+            onDismissRequest = { showClosedDialog = false },
+            title = { Text("Restaurant Closed") },
+            text = { Text("Restaurant is closed for today. Please make a reservation or pick up for tomorrow.") },
+            confirmButton = {
+                Button(onClick = { showClosedDialog = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
 
     if (showDatePicker) {
         DatePickerDialog(
@@ -126,7 +155,6 @@ fun CartScreen(navController: NavController, cartViewModel: CartViewModel = view
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
                     ) {
-                        // Header Banner
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -157,7 +185,6 @@ fun CartScreen(navController: NavController, cartViewModel: CartViewModel = view
                         }
 
                         Column(modifier = Modifier.padding(16.dp)) {
-                            // Cart Items Section
                             Text(
                                 text = "Selected Items",
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
@@ -167,7 +194,6 @@ fun CartScreen(navController: NavController, cartViewModel: CartViewModel = view
 
                             Spacer(modifier = Modifier.height(24.dp))
 
-                            // Order Type Selection
                             Text(
                                 text = "Choose Service",
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
@@ -226,7 +252,7 @@ fun CartScreen(navController: NavController, cartViewModel: CartViewModel = view
                                     total = cartViewModel.total
                                 )
                             } else {
-                                DoorDashDeliveryCard {
+                                DeliveryPolicyCard(cartViewModel.total) {
                                     uriHandler.openUri("https://www.doordash.com/store/kababistan-plano-36320377/80912392/?srsltid=AfmBOoqDmnOm5yvpdzSGPCg1nWUKlaEiX6Z9bb2HsgtppFZY8Tu3Xx8t")
                                 }
                             }
@@ -245,11 +271,32 @@ fun CartScreen(navController: NavController, cartViewModel: CartViewModel = view
                 ) {
                     Button(
                         onClick = {
-                            if (resDateText == "Select Date" || resTimeText == "Select Time" || customerName.isBlank() || customerPhone.isBlank()) {
+                            val now = Calendar.getInstance()
+                            val hour = now.get(Calendar.HOUR_OF_DAY)
+                            // 10:00 AM (10) to 11:00 PM (23)
+                            val isRestaurantOpen = hour in 10..22
+
+                            if (!isRestaurantOpen) {
+                                showClosedDialog = true
+                            } else if (resDateText == "Select Date" || resTimeText == "Select Time" || customerName.isBlank() || customerPhone.isBlank()) {
                                 Toast.makeText(context, "Please fill required details", Toast.LENGTH_SHORT).show()
                             } else if (selectedPaymentMethod == "Credit/Debit Card" && (cardNumber.length < 16 || cardExpiry.isBlank() || cardCvv.isBlank())) {
                                 Toast.makeText(context, "Please enter valid card details", Toast.LENGTH_SHORT).show()
                             } else {
+                                cartViewModel.confirmOrder(
+                                    userId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
+                                    userName = customerName,
+                                    phone = customerPhone,
+                                    cartItems = cartItems.map { item ->
+                                        OrderCartItem(
+                                            name = item.name,
+                                            price = item.priceDouble,
+                                            quantity = item.quantity
+                                        )
+                                    },
+                                    total = cartViewModel.total
+                                )
+                                
                                 cartViewModel.confirmOrder()
                                 navController.navigate("order_confirmation")
                             }
@@ -267,6 +314,98 @@ fun CartScreen(navController: NavController, cartViewModel: CartViewModel = view
             }
         }
     )
+}
+
+@Composable
+fun DeliveryPolicyCard(currentTotal: Double, onDoorDashClick: () -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(24.dp),
+        color = Color.White,
+        shadowElevation = 4.dp,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .background(PrimaryColor.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocalShipping,
+                    contentDescription = "Delivery",
+                    modifier = Modifier.size(40.dp),
+                    tint = PrimaryColor
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(20.dp))
+            
+            Text(
+                "Direct Delivery Policy",
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                color = Color.Black
+            )
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            Surface(
+                color = Color(0xFFFFF9C4),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "We provide direct delivery only for large orders exceeding $150. Free delivery is available within a 10-20 mile radius.",
+                    textAlign = TextAlign.Center,
+                    color = Color(0xFFF57F17),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+            
+            if (currentTotal < 150.0) {
+                Spacer(modifier = Modifier.height(20.dp))
+                Text(
+                    "Your current order is $${String.format(Locale.US, "%.2f", currentTotal)}. For smaller orders, please use DoorDash.",
+                    textAlign = TextAlign.Center,
+                    color = Color.Gray,
+                    fontSize = 13.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            Button(
+                onClick = onDoorDashClick,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF3008)),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().height(50.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Order via DoorDash", fontWeight = FontWeight.Bold)
+                }
+            }
+            
+            if (currentTotal >= 150.0) {
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedButton(
+                    onClick = { /* Handle direct contact/order */ },
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, PrimaryColor)
+                ) {
+                    Text("Contact for Direct Delivery", color = PrimaryColor, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -480,52 +619,6 @@ fun UniqueDateTimePicker(
 }
 
 @Composable
-fun DoorDashDeliveryCard(onDoorDashClick: () -> Unit) {
-    Surface(
-        shape = RoundedCornerShape(24.dp),
-        color = Color.White,
-        shadowElevation = 4.dp,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier.padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_delivery_time),
-                contentDescription = "Delivery",
-                modifier = Modifier.size(80.dp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                "Home Delivery via DoorDash",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                "For the fastest delivery to your doorstep, please use our official DoorDash store.",
-                textAlign = TextAlign.Center,
-                color = Color.Gray,
-                fontSize = 14.sp
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            Button(
-                onClick = onDoorDashClick,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF3008)),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.OpenInNew, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Order on DoorDash", fontWeight = FontWeight.Bold)
-                }
-            }
-        }
-    }
-}
-
-@Composable
 fun CustomerInfoCard(
     customerName: String,
     customerPhone: String,
@@ -551,11 +644,11 @@ fun CustomerInfoCard(
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            ReservationTextField(customerName, onNameChange, "Full Name", Icons.Default.Person)
+            CartReservationTextField(customerName, onNameChange, "Full Name", Icons.Default.Person)
             Spacer(modifier = Modifier.height(12.dp))
-            ReservationTextField(customerEmail, onEmailChange, "Email Address", Icons.Default.Email)
+            CartReservationTextField(customerEmail, onEmailChange, "Email Address", Icons.Default.Email)
             Spacer(modifier = Modifier.height(12.dp))
-            ReservationTextField(customerPhone, onPhoneChange, "Phone Number", Icons.Default.Phone)
+            CartReservationTextField(customerPhone, onPhoneChange, "Phone Number", Icons.Default.Phone)
             Spacer(modifier = Modifier.height(12.dp))
             
             OutlinedTextField(
@@ -731,7 +824,7 @@ fun CartSummaryRow(label: String, value: String, isTotal: Boolean = false, color
 }
 
 @Composable
-fun ReservationTextField(value: String, onValueChange: (String) -> Unit, label: String, icon: ImageVector) {
+fun CartReservationTextField(value: String, onValueChange: (String) -> Unit, label: String, icon: ImageVector) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -790,7 +883,7 @@ fun CartItemsSection(items: List<CartItem>, viewModel: CartViewModel) {
                                 Icon(Icons.Default.Close, null, tint = Color.Gray, modifier = Modifier.size(16.dp)) 
                             }
                         }
-                        Text("$${String.format(Locale.US, "%.2f", item.price)}", color = PrimaryColor, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text("$${String.format(Locale.US, "%.2f", item.priceDouble)}", color = PrimaryColor, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                         Spacer(modifier = Modifier.height(4.dp))
                         QuantityControls(item.quantity, { viewModel.increaseQuantity(item) }, { viewModel.decreaseQuantity(item) })
                     }
@@ -802,19 +895,53 @@ fun CartItemsSection(items: List<CartItem>, viewModel: CartViewModel) {
 
 @Composable
 fun QuantityControls(quantity: Int, onIncrease: () -> Unit, onDecrease: () -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        IconButton(
-            onClick = onDecrease, 
-            modifier = Modifier.size(28.dp).clip(CircleShape).background(Color(0xFFF5F5F5))
-        ) { 
-            Box(modifier = Modifier.size(8.dp, 1.5.dp).background(Color.Black)) 
+    Row(
+        verticalAlignment = Alignment.CenterVertically, 
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier
+            .background(Color(0xFFF5F5F5), RoundedCornerShape(12.dp))
+            .padding(horizontal = 4.dp, vertical = 2.dp)
+    ) {
+        Surface(
+            onClick = onDecrease,
+            shape = RoundedCornerShape(8.dp),
+            color = Color.White,
+            modifier = Modifier.size(36.dp),
+            shadowElevation = 1.dp
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = Icons.Default.Remove,
+                    contentDescription = "Decrease",
+                    modifier = Modifier.size(18.dp),
+                    tint = PrimaryColor
+                )
+            }
         }
-        Text(quantity.toString(), fontWeight = FontWeight.Bold, fontSize = 14.sp)
-        IconButton(
-            onClick = onIncrease, 
-            modifier = Modifier.size(28.dp).clip(CircleShape).background(PrimaryColor)
-        ) { 
-            Icon(Icons.Default.Add, null, tint = Color.White, modifier = Modifier.size(10.dp)) 
+        
+        Text(
+            text = quantity.toString(), 
+            fontWeight = FontWeight.ExtraBold, 
+            fontSize = 16.sp,
+            modifier = Modifier.padding(horizontal = 8.dp),
+            textAlign = TextAlign.Center
+        )
+        
+        Surface(
+            onClick = onIncrease,
+            shape = RoundedCornerShape(8.dp),
+            color = PrimaryColor,
+            modifier = Modifier.size(36.dp),
+            shadowElevation = 2.dp
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Increase",
+                    modifier = Modifier.size(18.dp),
+                    tint = Color.White
+                )
+            }
         }
     }
 }

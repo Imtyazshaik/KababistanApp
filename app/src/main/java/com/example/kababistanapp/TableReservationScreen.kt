@@ -1,5 +1,6 @@
 package com.example.kababistanapp
 
+import android.app.TimePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,11 +29,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.kababistanapp.ui.theme.PrimaryColor
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -51,10 +54,23 @@ fun TableReservationScreen(navController: NavController, cartViewModel: CartView
     val specialInstructions by cartViewModel.specialInstructions.collectAsState()
 
     var showDatePicker by remember { mutableStateOf(false) }
-    var showTimePicker by remember { mutableStateOf(false) }
     
     val datePickerState = rememberDatePickerState()
-    val timePickerState = rememberTimePickerState(is24Hour = false)
+
+    // Load default values once if empty
+    LaunchedEffect(Unit) {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null && (customerName.isBlank() || customerEmail.isBlank() || customerPhone.isBlank())) {
+            FirebaseFirestore.getInstance().collection("users").document(user.uid).get()
+                .addOnSuccessListener { doc ->
+                    if (doc.exists()) {
+                        if (customerName.isBlank()) cartViewModel.customerName.value = doc.getString("name") ?: ""
+                        if (customerEmail.isBlank()) cartViewModel.customerEmail.value = doc.getString("email") ?: ""
+                        if (customerPhone.isBlank()) cartViewModel.customerPhone.value = doc.getString("phone") ?: ""
+                    }
+                }
+        }
+    }
 
     if (showDatePicker) {
         DatePickerDialog(
@@ -73,29 +89,19 @@ fun TableReservationScreen(navController: NavController, cartViewModel: CartView
         ) { DatePicker(state = datePickerState) }
     }
 
-    if (showTimePicker) {
-        Dialog(onDismissRequest = { showTimePicker = false }) {
-            Surface(shape = RoundedCornerShape(24.dp), color = Color.White, modifier = Modifier.padding(16.dp)) {
-                Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Default.AccessTime, contentDescription = null, tint = PrimaryColor, modifier = Modifier.size(48.dp))
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = "Pick a Time", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
-                    Spacer(modifier = Modifier.height(24.dp))
-                    TimePicker(state = timePickerState)
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                        TextButton(onClick = { showTimePicker = false }) { Text("Cancel") }
-                        TextButton(onClick = {
-                            val hour = if (timePickerState.hour % 12 == 0) 12 else timePickerState.hour % 12
-                            val amPm = if (timePickerState.hour < 12) "AM" else "PM"
-                            cartViewModel.selectedTime.value = String.format(Locale.US, "%02d:%02d %s", hour, timePickerState.minute, amPm)
-                            showTimePicker = false
-                        }) { Text("OK") }
-                    }
-                }
-            }
-        }
-    }
+    // Native Scroll/Wheel Time Picker
+    val calendar = Calendar.getInstance()
+    val timePickerDialog = TimePickerDialog(
+        context,
+        { _, hourOfDay, minute ->
+            val hour = if (hourOfDay % 12 == 0) 12 else hourOfDay % 12
+            val amPm = if (hourOfDay < 12) "AM" else "PM"
+            cartViewModel.selectedTime.value = String.format(Locale.US, "%02d:%02d %s", hour, minute, amPm)
+        },
+        calendar.get(Calendar.HOUR_OF_DAY),
+        calendar.get(Calendar.MINUTE),
+        false
+    )
 
     Scaffold(
         topBar = {
@@ -117,11 +123,10 @@ fun TableReservationScreen(navController: NavController, cartViewModel: CartView
                     .padding(paddingValues)
                     .verticalScroll(rememberScrollState())
             ) {
-                // Banner
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
+                        .height(180.dp) // Slightly reduced height
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.shinwari_karahi),
@@ -160,7 +165,6 @@ fun TableReservationScreen(navController: NavController, cartViewModel: CartView
                 }
 
                 Column(modifier = Modifier.padding(16.dp)) {
-                    // Schedule Card
                     Surface(
                         shape = RoundedCornerShape(24.dp),
                         color = Color.White,
@@ -188,7 +192,7 @@ fun TableReservationScreen(navController: NavController, cartViewModel: CartView
                                     value = resTimeText,
                                     icon = Icons.Default.AccessTime,
                                     modifier = Modifier.weight(1f),
-                                    onClick = { showTimePicker = true }
+                                    onClick = { timePickerDialog.show() }
                                 )
                             }
                             
@@ -213,7 +217,6 @@ fun TableReservationScreen(navController: NavController, cartViewModel: CartView
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Contact Info
                     Surface(
                         shape = RoundedCornerShape(24.dp),
                         color = Color.White,
@@ -280,6 +283,22 @@ fun TableReservationScreen(navController: NavController, cartViewModel: CartView
                 }
             }
         }
+    )
+}
+
+@Composable
+fun ReservationTextField(value: String, onValueChange: (String) -> Unit, label: String, icon: ImageVector) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = Modifier.fillMaxWidth(),
+        label = { Text(label) },
+        leadingIcon = { Icon(icon, null, tint = PrimaryColor) },
+        shape = RoundedCornerShape(16.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = PrimaryColor,
+            unfocusedBorderColor = Color(0xFFEEEEEE)
+        )
     )
 }
 

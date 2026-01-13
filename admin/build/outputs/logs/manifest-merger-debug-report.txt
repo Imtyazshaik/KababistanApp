@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:2:1-22:12
-INJECTED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:2:1-22:12
-INJECTED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:2:1-22:12
-INJECTED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:2:1-22:12
+ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:2:1-17:12
+INJECTED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:2:1-17:12
+INJECTED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:2:1-17:12
+INJECTED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:2:1-17:12
 MERGED from [androidx.navigation:navigation-runtime-android:2.9.6] /Users/sunny/.gradle/caches/8.13/transforms/1d274292a846f10a3ff83ceb32511b57/transformed/navigation-runtime-release/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.navigation:navigation-common-android:2.9.6] /Users/sunny/.gradle/caches/8.13/transforms/9a3330083d8ea08e675d8512ec11f872/transformed/navigation-common-release/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.navigation:navigation-compose-android:2.9.6] /Users/sunny/.gradle/caches/8.13/transforms/0a6bf7f1836e0157c7aef3429d6bafce/transformed/navigation-compose-release/AndroidManifest.xml:2:1-7:12
@@ -106,8 +106,8 @@ MERGED from [com.google.android.play:core-common:2.0.3] /Users/sunny/.gradle/cac
 	xmlns:android
 		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:2:11-69
 application
-ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:4:5-20:19
-INJECTED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:4:5-20:19
+ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:4:5-15:19
+INJECTED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:4:5-15:19
 MERGED from [com.google.firebase:firebase-auth:23.1.0] /Users/sunny/.gradle/caches/8.13/transforms/7c53789cde0c3602ccae4c87f90a114b/transformed/firebase-auth-23.1.0/AndroidManifest.xml:28:5-73:19
 MERGED from [com.google.firebase:firebase-auth:23.1.0] /Users/sunny/.gradle/caches/8.13/transforms/7c53789cde0c3602ccae4c87f90a114b/transformed/firebase-auth-23.1.0/AndroidManifest.xml:28:5-73:19
 MERGED from [com.google.firebase:firebase-firestore:25.1.1] /Users/sunny/.gradle/caches/8.13/transforms/0825ac07e8680be6a4048985d72da2c9/transformed/firebase-firestore-25.1.1/AndroidManifest.xml:13:5-24:19
@@ -152,36 +152,26 @@ MERGED from [com.google.android.play:core-common:2.0.3] /Users/sunny/.gradle/cac
 		INJECTED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.17.0] /Users/sunny/.gradle/caches/8.13/transforms/650306da6d0c5e6a2ccd57b6c9b87ea6/transformed/core-1.17.0/AndroidManifest.xml:28:18-86
-	android:supportsRtl
-		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:9:9-35
 	android:label
-		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:7:9-41
-	android:roundIcon
-		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:8:9-67
-	android:icon
-		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:6:9-62
-	android:allowBackup
-		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:5:9-35
+		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:5:9-41
 	android:theme
-		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:10:9-53
+		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:6:9-53
 activity#com.example.kababistanadmin.AdminMainActivity
-ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:11:9-19:20
-	android:label
-		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:14:13-45
+ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:7:9-14:20
 	android:exported
-		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:13:13-36
+		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:9:13-36
 	android:name
-		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:12:13-46
+		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:8:13-73
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:15:13-18:29
+ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:10:13-13:29
 action#android.intent.action.MAIN
-ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:16:17-69
+ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:11:17-69
 	android:name
-		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:16:25-66
+		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:11:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:17:17-77
+ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:12:17-77
 	android:name
-		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:17:27-74
+		ADDED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml:12:27-74
 uses-sdk
 INJECTED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /Users/sunny/AndroidStudioProjects/KababistanApp/admin/src/main/AndroidManifest.xml

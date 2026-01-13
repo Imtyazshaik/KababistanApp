@@ -79,6 +79,8 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.firebase.ai)
     implementation(libs.androidx.ui)
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.storage)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -14,7 +14,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,25 +31,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.kababistanapp.ui.theme.PrimaryColor
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.auth.*
+import com.google.firebase.firestore.FirebaseFirestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(navController: NavController) {
     var name by remember { mutableStateOf("") }
-    var phoneNumber by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var otp by remember { mutableStateOf("") }
-    val isOtpSent by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     
     val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
-        // Single Lightly Displayed Header Image (Different from Login)
         Image(
             painter = painterResource(id = R.drawable.kabulipilau),
             contentDescription = null,
@@ -61,7 +57,6 @@ fun SignUpScreen(navController: NavController) {
             contentScale = ContentScale.Crop
         )
 
-        // Gradient overlay
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -81,7 +76,6 @@ fun SignUpScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            // Top Bar with Back Button
             TopAppBar(
                 title = { },
                 navigationIcon = {
@@ -114,13 +108,12 @@ fun SignUpScreen(navController: NavController) {
                     )
                 )
                 Text(
-                    text = "Join us for authentic Afghan flavors",
+                    text = "Join Kababistan today",
                     style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Input Card for better UI
                 Card(
                     shape = RoundedCornerShape(24.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
@@ -139,6 +132,7 @@ fun SignUpScreen(navController: NavController) {
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(16.dp),
                             singleLine = true,
+                            enabled = !isLoading,
                             colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PrimaryColor, unfocusedBorderColor = Color.LightGray)
                         )
 
@@ -152,21 +146,8 @@ fun SignUpScreen(navController: NavController) {
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(16.dp),
                             singleLine = true,
+                            enabled = !isLoading,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PrimaryColor, unfocusedBorderColor = Color.LightGray)
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        OutlinedTextField(
-                            value = phoneNumber,
-                            onValueChange = { phoneNumber = it },
-                            label = { Text("Phone Number") },
-                            leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null, tint = PrimaryColor) },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(16.dp),
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                             colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PrimaryColor, unfocusedBorderColor = Color.LightGray)
                         )
 
@@ -181,21 +162,10 @@ fun SignUpScreen(navController: NavController) {
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(16.dp),
                             singleLine = true,
+                            enabled = !isLoading,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                             colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PrimaryColor, unfocusedBorderColor = Color.LightGray)
                         )
-
-                        if (isOtpSent) {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            OutlinedTextField(
-                                value = otp,
-                                onValueChange = { otp = it },
-                                label = { Text("Enter OTP") },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(16.dp),
-                                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PrimaryColor)
-                            )
-                        }
 
                         Spacer(modifier = Modifier.height(32.dp))
 
@@ -205,38 +175,52 @@ fun SignUpScreen(navController: NavController) {
                                     Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()
                                     return@Button
                                 }
+                                
                                 isLoading = true
                                 auth.createUserWithEmailAndPassword(email.trim(), password)
                                     .addOnCompleteListener { task ->
-                                        isLoading = false
                                         if (task.isSuccessful) {
                                             val user = auth.currentUser
                                             val profileUpdates = UserProfileChangeRequest.Builder()
                                                 .setDisplayName(name)
                                                 .build()
-                                            user?.updateProfile(profileUpdates)
-                                            navController.navigate("home") { popUpTo(0) }
+                                            
+                                            user?.updateProfile(profileUpdates)?.addOnCompleteListener {
+                                                val userData = hashMapOf(
+                                                    "name" to name,
+                                                    "email" to email.trim(),
+                                                    "uid" to (user.uid)
+                                                )
+                                                
+                                                // Saving to Firestore
+                                                db.collection("users").document(user.uid).set(userData)
+                                                    .addOnSuccessListener {
+                                                        isLoading = false
+                                                        Toast.makeText(context, "Account created successfully!", Toast.LENGTH_SHORT).show()
+                                                        navController.navigate("home") { 
+                                                            popUpTo("signup") { inclusive = true } 
+                                                        }
+                                                    }
+                                                    .addOnFailureListener { e ->
+                                                        isLoading = false
+                                                        Toast.makeText(context, "Firestore Error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                                                    }
+                                            }
                                         } else {
-                                            Toast.makeText(context, "Error: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                                            isLoading = false
+                                            Toast.makeText(context, "Auth Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                                         }
                                     }
                             },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
                             shape = RoundedCornerShape(16.dp),
-                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                             enabled = !isLoading
                         ) {
                             if (isLoading) {
-                                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                             } else {
-                                Text(
-                                    text = "SIGN UP",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                Text("SIGN UP", fontWeight = FontWeight.Bold)
                             }
                         }
                     }

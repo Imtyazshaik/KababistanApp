@@ -59,6 +59,7 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     
     implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation(libs.firebase.storage)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

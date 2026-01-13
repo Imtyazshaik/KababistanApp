@@ -20,7 +20,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -69,7 +68,7 @@ fun LoginScreen(navController: NavController) {
                 auth.signInWithCredential(credential).addOnCompleteListener { task ->
                     isLoading = false
                     if (task.isSuccessful) {
-                        navController.navigate("home") { popUpTo(0) }
+                        navController.navigate("home") { popUpTo("login") { inclusive = true } }
                     } else {
                         Toast.makeText(context, task.exception?.localizedMessage ?: "Sign-in failed", Toast.LENGTH_LONG).show()
                     }
@@ -81,7 +80,6 @@ fun LoginScreen(navController: NavController) {
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
-        // Single Lightly Displayed Header Image
         Image(
             painter = painterResource(id = R.drawable.chapli_kabab),
             contentDescription = null,
@@ -92,7 +90,6 @@ fun LoginScreen(navController: NavController) {
             contentScale = ContentScale.Crop
         )
 
-        // Gradient overlay for better text visibility and transition
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -116,10 +113,8 @@ fun LoginScreen(navController: NavController) {
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Increased Spacer to move details column down
             Spacer(modifier = Modifier.height(280.dp))
 
-            // App Branding Card
             Card(
                 shape = RoundedCornerShape(24.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
@@ -138,15 +133,8 @@ fun LoginScreen(navController: NavController) {
                             letterSpacing = 2.sp
                         )
                     )
-                    Text(
-                        text = "Authentic Afghan Flavors",
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            color = Color.Gray,
-                            fontWeight = FontWeight.Medium
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(32.dp))
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     if (isLoading) {
                         LinearProgressIndicator(
@@ -165,10 +153,7 @@ fun LoginScreen(navController: NavController) {
                         enabled = !isLoading,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryColor,
-                            unfocusedBorderColor = Color.LightGray
-                        )
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PrimaryColor, unfocusedBorderColor = Color.LightGray)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     OutlinedTextField(
@@ -182,10 +167,7 @@ fun LoginScreen(navController: NavController) {
                         enabled = !isLoading,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryColor,
-                            unfocusedBorderColor = Color.LightGray
-                        )
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = PrimaryColor, unfocusedBorderColor = Color.LightGray)
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -198,7 +180,13 @@ fun LoginScreen(navController: NavController) {
                                 auth.signInWithEmailAndPassword(trimmedEmail, password).addOnCompleteListener { task ->
                                     isLoading = false
                                     if (task.isSuccessful) {
-                                        navController.navigate("home") { popUpTo(0) }
+                                        val user = auth.currentUser
+                                        if (user != null && user.isEmailVerified) {
+                                            navController.navigate("home") { popUpTo("login") { inclusive = true } }
+                                        } else {
+                                            Toast.makeText(context, "Please verify your email address. Check your inbox/spam for the link.", Toast.LENGTH_LONG).show()
+                                            auth.signOut()
+                                        }
                                     } else {
                                         Toast.makeText(context, "Login Failed: ${task.exception?.localizedMessage}", Toast.LENGTH_LONG).show()
                                     }
@@ -208,19 +196,59 @@ fun LoginScreen(navController: NavController) {
                             }
                         },
                         enabled = !isLoading,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
-                        shape = RoundedCornerShape(16.dp),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                        shape = RoundedCornerShape(16.dp)
                     ) {
-                        if (isLoading) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
-                        } else {
-                            Text("LOG IN", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text("LOG IN", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    }
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Added Resend Verification Button
+                    if (email.trim().isNotEmpty()) {
+                        TextButton(
+                            onClick = {
+                                isLoading = true
+                                auth.signInWithEmailAndPassword(email.trim(), password).addOnCompleteListener { loginTask ->
+                                    if (loginTask.isSuccessful) {
+                                        auth.currentUser?.sendEmailVerification()?.addOnCompleteListener { verifyTask ->
+                                            isLoading = false
+                                            if (verifyTask.isSuccessful) {
+                                                Toast.makeText(context, "Verification link resent to ${email.trim()}. Check Spam folder too.", Toast.LENGTH_LONG).show()
+                                            } else {
+                                                Toast.makeText(context, "Error: ${verifyTask.exception?.message}", Toast.LENGTH_SHORT).show()
+                                            }
+                                            auth.signOut() // Sign out again after resending
+                                        }
+                                    } else {
+                                        isLoading = false
+                                        Toast.makeText(context, "Enter correct email/pass to resend link", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            },
+                            enabled = !isLoading
+                        ) {
+                            Text("Didn't get the link? Resend Email", color = PrimaryColor)
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Text(
+                        text = "Forgot Password?",
+                        color = PrimaryColor,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.clickable {
+                            if (email.trim().isNotEmpty()) {
+                                auth.sendPasswordResetEmail(email.trim()).addOnCompleteListener { 
+                                    Toast.makeText(context, "Reset link sent to Gmail", Toast.LENGTH_SHORT).show()
+                                }
+                            } else {
+                                Toast.makeText(context, "Enter email first", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    )
                 }
             }
 
@@ -240,22 +268,6 @@ fun LoginScreen(navController: NavController) {
                     Image(painterResource(R.drawable.ic_google), null, modifier = Modifier.size(22.dp))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Google", color = Color.Black)
-                }
-                OutlinedButton(
-                    onClick = { /* Facebook Auth */ },
-                    modifier = Modifier.weight(1f).height(50.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    enabled = !isLoading,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray)
-                ) {
-                    Icon(
-                        painter = painterResource(id = android.R.drawable.ic_menu_share), // Placeholder icon since ic_facebook is missing
-                        contentDescription = null,
-                        modifier = Modifier.size(22.dp),
-                        tint = Color(0xFF1877F2)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Facebook", color = Color.Black)
                 }
             }
 

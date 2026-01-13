@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -100,7 +101,9 @@ fun OrdersScreen(navController: NavController, cartViewModel: CartViewModel) {
     }
 
     if (selectedOrder != null) {
-        ReservationDetailsDialog(order = selectedOrder!!, onDismiss = { selectedOrder = null }, cartViewModel = cartViewModel)
+        // Track the live version of the selected order from the list
+        val liveOrder = previousOrders.find { it.id == selectedOrder?.id } ?: selectedOrder!!
+        ReservationDetailsDialog(order = liveOrder, onDismiss = { selectedOrder = null }, cartViewModel = cartViewModel)
     }
 }
 
@@ -120,8 +123,14 @@ fun ReservationRecordCard(order: Order, onClick: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
-                    Text(text = order.id, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = order.id, 
+                        fontWeight = FontWeight.ExtraBold, 
+                        fontSize = 16.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp)) {
                         Icon(
                             imageVector = if (order.type == "Reservation") Icons.Default.DateRange else Icons.Default.ShoppingCart,
@@ -133,6 +142,7 @@ fun ReservationRecordCard(order: Order, onClick: () -> Unit) {
                         Text(text = "${order.type}: ${order.date} • ${order.time}", color = Color.Gray, fontSize = 12.sp)
                     }
                 }
+                Spacer(Modifier.width(8.dp))
                 ReservationStatusBadge(order.status)
             }
             
@@ -189,17 +199,26 @@ fun ReservationRecordCard(order: Order, onClick: () -> Unit) {
 
 @Composable
 fun ReservationStatusBadge(status: String) {
-    val containerColor = when {
-        status.contains("New") -> Color(0xFFE3F2FD)
-        status == "Completed" || status == "Delivered" || status == "Picked up" -> Color(0xFFE8F5E9)
-        status == "Cancelled" -> Color(0xFFFFEBEE)
+    val containerColor = when (status.lowercase()) {
+        "pending" -> Color(0xFFE3F2FD)
+        "accepted", "ready" -> Color(0xFFE8F5E9)
+        "rejected", "cancelled" -> Color(0xFFFFEBEE)
+        "completed", "delivered", "picked up" -> Color(0xFFE8F5E9)
         else -> Color(0xFFF5F5F5)
     }
-    val contentColor = when {
-        status.contains("New") -> Color(0xFF1976D2)
-        status == "Completed" || status == "Delivered" || status == "Picked up" -> Color(0xFF2E7D32)
-        status == "Cancelled" -> Color(0xFFD32F2F)
+    val contentColor = when (status.lowercase()) {
+        "pending" -> Color(0xFF1976D2)
+        "accepted", "ready" -> Color(0xFF2E7D32)
+        "rejected", "cancelled" -> Color(0xFFD32F2F)
+        "completed", "delivered", "picked up" -> Color(0xFF2E7D32)
         else -> Color(0xFF757575)
+    }
+    
+    val displayText = when (status.lowercase()) {
+        "pending" -> "Order Pending"
+        "accepted" -> "Order Accepted ✅"
+        "rejected" -> "Order Rejected ❌"
+        else -> status
     }
 
     Surface(
@@ -207,11 +226,13 @@ fun ReservationStatusBadge(status: String) {
         shape = RoundedCornerShape(8.dp)
     ) {
         Text(
-            text = status,
+            text = displayText,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
             color = contentColor,
             fontSize = 11.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            softWrap = false
         )
     }
 }
@@ -260,17 +281,24 @@ fun ReservationDetailsDialog(order: Order, onDismiss: () -> Unit, cartViewModel:
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    val icon = when {
-                        order.status == "Completed" || order.status == "Delivered" || order.status == "Picked up" -> Icons.Default.CheckCircle
-                        order.status == "Cancelled" -> Icons.Default.Close
+                    val icon = when (order.status.lowercase()) {
+                        "completed", "delivered", "picked up", "accepted" -> Icons.Default.CheckCircle
+                        "rejected", "cancelled" -> Icons.Default.Close
                         else -> Icons.Default.Info
                     }
-                    val color = when {
-                        order.status == "Completed" || order.status == "Delivered" || order.status == "Picked up" -> Color(0xFF4CAF50)
-                        order.status == "Cancelled" -> Color.Red
+                    val color = when (order.status.lowercase()) {
+                        "completed", "delivered", "picked up", "accepted" -> Color(0xFF4CAF50)
+                        "rejected", "cancelled" -> Color.Red
                         else -> PrimaryColor
                     }
                     
+                    val displayText = when (order.status.lowercase()) {
+                        "pending" -> "Order Pending"
+                        "accepted" -> "Order Accepted ✅"
+                        "rejected" -> "Order Rejected ❌"
+                        else -> order.status
+                    }
+
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
@@ -279,10 +307,11 @@ fun ReservationDetailsDialog(order: Order, onDismiss: () -> Unit, cartViewModel:
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = order.status,
+                        text = displayText,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
-                        color = color
+                        color = color,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                     Text(text = "Order ID: ${order.id}", color = Color.Gray, fontSize = 14.sp)
                     Text(text = "Placed on: $orderDateFormatted", color = Color.Gray, fontSize = 12.sp)
@@ -347,7 +376,7 @@ fun ReservationDetailsDialog(order: Order, onDismiss: () -> Unit, cartViewModel:
                                 Text(text = "Qty: ${item.quantity}", fontSize = 12.sp, color = Color.Gray)
                             }
                             Text(
-                                text = "$${String.format(Locale.US, "%.2f", item.price * item.quantity)}",
+                                text = "$${String.format(Locale.US, "%.2f", item.priceDouble * item.quantity)}",
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -370,7 +399,7 @@ fun ReservationDetailsDialog(order: Order, onDismiss: () -> Unit, cartViewModel:
 
                 Spacer(modifier = Modifier.height(40.dp))
                 
-                if (order.status.contains("New")) {
+                if (order.status.lowercase() == "pending") {
                     OutlinedButton(
                         onClick = { 
                             cartViewModel.cancelOrder(order.id)

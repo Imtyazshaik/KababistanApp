@@ -1,0 +1,7 @@
+com.example.kababistanadmin.test.admin-core-1.7.0-0 /Users/sunny/.gradle/caches/8.13/transforms/54b939e0e91ea33d47d1acfb55c59d9a/transformed/core-1.7.0/res
+com.example.kababistanadmin.test.admin-tracing-1.2.0-1 /Users/sunny/.gradle/caches/8.13/transforms/71fa06e521bdbe8b98d9f59fe613ad41/transformed/tracing-1.2.0/res
+com.example.kababistanadmin.test.admin-androidTest-2 /Users/sunny/AndroidStudioProjects/KababistanApp/admin/build/generated/res/resValues/androidTest/debug
+com.example.kababistanadmin.test.admin-updated_navigation_xml-3 /Users/sunny/AndroidStudioProjects/KababistanApp/admin/build/generated/updated_navigation_xml/debugAndroidTest
+com.example.kababistanadmin.test.admin-mergeDebugAndroidTestResources-4 /Users/sunny/AndroidStudioProjects/KababistanApp/admin/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/merged.dir
+com.example.kababistanadmin.test.admin-mergeDebugAndroidTestResources-5 /Users/sunny/AndroidStudioProjects/KababistanApp/admin/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/stripped.dir
+com.example.kababistanadmin.test.admin-debugAndroidTest-6 /Users/sunny/AndroidStudioProjects/KababistanApp/admin/build/intermediates/merged_res/debugAndroidTest/mergeDebugAndroidTestResources

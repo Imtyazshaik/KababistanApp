@@ -32,9 +32,9 @@ fun RestaurantApp() {
     val navController = rememberNavController()
     val cartViewModel: CartViewModel = viewModel()
     
-    // Start with home if logged in, otherwise login
+    // Start with home only if logged in AND email is verified
     val currentUser = Firebase.auth.currentUser
-    val startDestination = if (currentUser != null) "home" else "login"
+    val startDestination = if (currentUser != null && currentUser.isEmailVerified) "home" else "login"
 
     NavHost(
         navController = navController,
@@ -48,6 +48,12 @@ fun RestaurantApp() {
         }
         composable("home") {
             HomeScreen(navController = navController, cartViewModel = cartViewModel)
+        }
+        composable("special_offers") {
+            SpecialOffersScreen(navController = navController)
+        }
+        composable("favorites") {
+            FavoritesScreen(navController = navController, cartViewModel = cartViewModel)
         }
         composable(
             "food_detail/{name}/{price}/{imageRes}",
@@ -82,6 +88,9 @@ fun RestaurantApp() {
         }
         composable("orders") {
             OrdersScreen(navController = navController, cartViewModel = cartViewModel)
+        }
+        composable("notifications") {
+            NotificationScreen(navController = navController, cartViewModel = cartViewModel)
         }
         composable("help") {
             HelpScreen(navController = navController, cartViewModel = cartViewModel)

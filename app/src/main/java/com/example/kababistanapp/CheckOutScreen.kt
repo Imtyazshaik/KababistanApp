@@ -300,7 +300,8 @@ fun OrderItemsSection(items: List<CartItem>) {
             items.forEachIndexed { index, item ->
                 Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text("${item.name} x${item.quantity}", color = Color.DarkGray, fontWeight = FontWeight.Medium)
-                    Text(String.format(Locale.US, "$%.2f", item.price * item.quantity), fontWeight = FontWeight.Bold)
+                    // Use priceDouble from CartItem in Models.kt to resolve type ambiguity
+                    Text(String.format(Locale.US, "$%.2f", item.priceDouble * item.quantity), fontWeight = FontWeight.Bold)
                 }
                 if (index < items.size - 1) HorizontalDivider(color = Color(0xFFF9F9F9))
             }

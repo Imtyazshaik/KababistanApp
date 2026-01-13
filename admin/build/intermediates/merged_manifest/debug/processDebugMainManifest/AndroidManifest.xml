@@ -19,20 +19,14 @@
     <uses-permission android:name="com.example.kababistanadmin.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
 
     <application
-        android:allowBackup="true"
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
         android:debuggable="true"
         android:extractNativeLibs="false"
-        android:icon="@android:drawable/ic_menu_info_details"
         android:label="Kababistan Admin"
-        android:roundIcon="@android:drawable/ic_menu_info_details"
-        android:supportsRtl="true"
-        android:testOnly="true"
         android:theme="@style/Theme.KababistanAdmin" >
         <activity
             android:name="com.example.kababistanadmin.AdminMainActivity"
-            android:exported="true"
-            android:label="Kababistan Admin" >
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

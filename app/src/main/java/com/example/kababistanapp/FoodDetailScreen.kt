@@ -3,13 +3,18 @@ package com.example.kababistanapp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,6 +36,9 @@ fun FoodDetailScreen(
     imageRes: Int,
     itemRating: String = "4.8"
 ) {
+    val favorites by cartViewModel.favorites.collectAsState()
+    val isFavorite = itemName in favorites
+
     Scaffold(
         bottomBar = {
             Surface(
@@ -73,13 +81,35 @@ fun FoodDetailScreen(
                     modifier = Modifier.fillMaxSize()
                 )
                 
-                IconButton(
-                    onClick = { navController.popBackStack() },
+                Row(
                     modifier = Modifier
-                        .padding(top = 48.dp, start = 16.dp)
-                        .background(Color.White.copy(alpha = 0.7f), RoundedCornerShape(12.dp))
+                        .fillMaxWidth()
+                        .statusBarsPadding()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                    ) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
+                    }
+
+                    IconButton(
+                        onClick = { cartViewModel.toggleFavorite(itemName) },
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = "Favorite",
+                            tint = if (isFavorite) Color.Red else Color.Black
+                        )
+                    }
                 }
             }
 
