@@ -1,40 +1,58 @@
-Excited to share my latest Android application built using Kotlin & Jetpack Compose 📱🚀
+Excited to share a glimpse of my latest Android project built using Kotlin + Jetpack Compose 🚀
 
-This is a complete end-to-end Restaurant Ordering & Table Reservation App with both User and Admin flows, designed with modern UI and real-world functionality.
+I’ve been working on a complete Food Ordering & Table Reservation App with a modern, production-style UI/UX, covering both User and Admin flows.
 
-🔹 Key Features Implemented:
-• Home screen with categories, search, offers, and location-based restaurant view
+🍽️ User App Highlights
+• Home screen with categories, search, special offers, and location-based restaurant view
 • Special Offers module with coupon codes and discounts
-• Dynamic menu listing with ratings, pricing, favorites, and add-to-cart
+• Dynamic menu with ratings, pricing, favorites, and add-to-cart
 • Smart Cart with empty state handling and checkout flow
-• Order History & Reservations tracking
-• Table Reservation system with date, time, guest count, and contact details
-• Restaurant closed-time validation with user-friendly popup
-• Profile management and order history
-• Admin dashboard for pickup orders with status tracking (Completed / Rejected), receipt generation, and order history
+• Order History & Reservation tracking
+• Table Reservation with date, time, guest count, and contact details
+• Restaurant closed-time validation with user-friendly alerts
+• Profile & account management
 
-🔹 Tech Stack & Concepts:
+🛠️ Admin Panel Features
+• Pickup order tracking
+• Reservation management
+• Order status handling (Completed / Rejected)
+• Receipt generation
+• Order & reservation history
+
+📱 What I Worked With
 • Kotlin
 • Jetpack Compose
 • MVVM Architecture
 • Navigation Components
-• Sta<img wid<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 16 26 PM" src="https://github.com/user-attachments/assets/7c2b10d4-8eff-4767-b0fc-0636ecb10e2e" />
-th="383" height="844" alt="Screenshot 2026-01-16 at 11 29 21 PM" src="https://github.com/user-attachments/assets/9988cead-cb73-47c4-b2b1-5d16e2336860" />
-<img width="383" height="844" alt="Screenshot 2026-01-16 at 11 29 14 PM" src="https://github.com/user-attachments/assets/0e688cef-a05a-430f-a4ec-ad455584044f" />
-<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 17 45 PM" src="https://github.com/user-attachments/assets/c8d2bd3d-02c8-4eda-95ca-9031aa9d8a81" />
-<img width="392" he<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 16 32 PM" src="https://github.com/user-attachments/assets/9eebe081-6c78-4920-9f66-0c19ebd32d77" />
-ight="850" alt="Screenshot 2026-01-16 at 11 17 37 PM" src="https://github.com/user-attachments/assets/c7b6fe84-58f0-44c5-a960-a020032aac49" />
-<im<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 16 20 PM" src="https://github.com/user-attachments/assets/0f6e9823-29aa-4aba-b62f-ca9cc01302e5" />
-g width="392" height="850" alt="Screenshot 2026-01-16 at 11 17 29 PM" src="https://github.com/user-attachments/assets/c0f754d6-fb58-4c45-84c7-6427fe39c107" />
-<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 17 15 PM" src="https://github.com/user-attachments/assets/d50a790c-23b7-4936-8e64-b52ce417a2ed" />
-<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 17 09 PM" src="https://github.com/user-attachments/assets/b5ce50b0-f599-4bf0-9f7a-6e24c9d7904b" />
-<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 16 56 PM" src="https://github.com/user-attachments/assets/41fbb806-6e25-4580-8866-92425b472def" />
-te Management
-• Material Design 3<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 16 14 PM" src="https://github.com/user-attachments/assets/c2672df3-5511-4111-92d5-5e97f3c0a252" />
+• State Management
+• Material Design 3
+• Clean, responsive UI & real-world business rules (store hours, validation, flows)
 
-• Clean UI/UX with responsive layouts
+This project helped me gain hands-on experience in building an end-to-end Android application with scalable UI architecture, real-time state handling, form validations, and business logic implementation.
 
-This project helped me strengthen my hands-on skills in building production-style Android apps, handling real-time states, form validations, business rules (like store hours), and scalable UI architecture.
-<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 15 57 PM" src="https://github.com/user-attachments/assets/2bced62a-9ee6-4a8b-b442-f3f79218b5c6" />
+Currently enhancing it with:
+➡️ Backend integration
+➡️ Payment gateway
+➡️ Real-time order tracking & notifications
 
-Proud of the progress and continuously improving it with backend integration, payment gateway, and live order tracking next.
+Sharing a few screenshots and a demo video from the app. Proud of the progress and excited to keep improving it!
+
+<img width="383" height="844" alt="Screenshot 2026-01-16 at 11 29 42 PM" src="https://github.com/user-attachments/assets/c7f68f3b-a7a9-4579-a187-e4a00c2ff50f" />
+<img width="383" height="844" alt="Screenshot 2026-01-16 at 11 29 21 PM" src="https://github.com/user-attachments/assets/5c74dbc9-ab31-46c4-952d-92eb298965d3" />
+<img width="383" height="844" alt="Screenshot 2026-01-16 at 11 29 14 PM" src="https://github.com/user-attachments/assets/fce706c1-9fc6-4105-a66e-d742c373fec6" />
+<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 17 45 PM" src="https://github.com/user-attachments/assets/d4619a64-4f19-4d6d-94d3-3158da2a1733" />
+<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 17 37 PM" src="https://github.com/user-attachments/assets/854c2aff-bec6-4c88-b5d4-f4ec1745f0fc" />
+<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 17 29 PM" src="https://github.com/user-attachments/assets/62eada33-36b2-4bf6-afa8-d72d2061f6eb" />
+<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 17 15 PM" src="https://github.com/user-attachments/assets/6c9a9a97-172b-4608-8f2f-dfacd40c6586" />
+<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 17 09 PM" src="https://github.com/user-attachments/assets/d81c58d8-4583-453a-8111-4a9f0b6fa979" />
+<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 16 56 PM" src="https://github.com/user-attachments/assets/474af730-76fb-4b42-9f2d-8d57a69b310a" />
+<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 16 48 PM" src="https://github.com/user-attachments/assets/cbb8d912-860e-4478-bf2b-24d092414218" />
+<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 16 42 PM" src="https://github.com/user-attachments/assets/c6514abf-8251-4ec1-b97f-d71a86facc1b" />
+<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 16 32 PM" src="https://github.com/user-attachments/assets/8b637838-5e37-4780-91b6-11ed8e0abf03" />
+<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 16 26 PM" src="https://github.com/user-attachments/assets/eb44f480-ea3f-4209-b284-7d1e6165ed1e" />
+<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 16 20 PM" src="https://github.com/user-attachments/assets/8a969580-e291-4b95-81b7-40932741bdba" />
+<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 16 14 PM" src="https://github.com/user-attachments/assets/2d3ae14b-8fa0-4f68-8f45-8d0e3a136d75" />
+<img width="392" height="850" alt="Screenshot 2026-01-16 at 11 15 57 PM" src="https://github.com/user-attachments/assets/32355758-fa08-4806-ab4d-d7d8848127bf" />
+
+
+
