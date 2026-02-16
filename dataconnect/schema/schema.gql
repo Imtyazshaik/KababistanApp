@@ -1,0 +1,46 @@
+type Restaurant @table {
+  id: UUID! @default(expr: "uuidV4()")
+  name: String!
+  address: String!
+  phoneNumber: String!
+  description: String
+  imageUrl: String
+}
+
+type MenuItem @table {
+  id: UUID! @default(expr: "uuidV4()")
+  restaurant: Restaurant!
+  name: String!
+  price: Float!
+  category: String!
+  description: String
+  imageUrl: String
+  availability: String
+}
+
+type Customer @table {
+  id: UUID! @default(expr: "uuidV4()")
+  name: String!
+  phoneNumber: String!
+  email: String
+  address: String
+}
+
+type Order @table {
+  id: UUID! @default(expr: "uuidV4()")
+  restaurant: Restaurant!
+  customer: Customer!
+  orderDate: Timestamp! @default(expr: "request.time")
+  status: String!
+  specialInstructions: String
+  totalAmount: Float
+}
+
+type OrderItem @table {
+  id: UUID! @default(expr: "uuidV4()")
+  order: Order!
+  menuItem: MenuItem!
+  quantity: Int!
+  priceAtOrder: Float!
+  notes: String
+}

@@ -1,0 +1,5 @@
+connectorId: "kababistan-connector"
+generate:
+  kotlinSdk:
+    outputDir: "../app/src/main/java/com/example/kababistanapp/dataconnect"
+    package: "com.example.kababistanapp.dataconnect"

@@ -1,0 +1,57 @@
+# Queries
+query GetRestaurants @auth(level: PUBLIC) {
+  restaurants {
+    id
+    name
+    address
+    description
+    imageUrl
+  }
+}
+
+query GetRestaurantDetails($id: UUID!) @auth(level: PUBLIC) {
+  restaurant(id: $id) {
+    id
+    name
+    address
+    phoneNumber
+    description
+    imageUrl
+    menuItems_on_restaurant {
+      id
+      name
+      price
+      category
+      imageUrl
+    }
+  }
+}
+
+query GetCustomerOrders($customerId: UUID!) @auth(level: USER_ID) {
+  orders(where: { customerId: { eq: $customerId } }) {
+    id
+    orderDate
+    status
+    totalAmount
+    restaurant {
+      name
+    }
+  }
+}
+
+# Mutations
+mutation CreateOrder(
+  $restaurantId: UUID!,
+  $customerId: UUID!,
+  $status: String!,
+  $totalAmount: Float,
+  $specialInstructions: String
+) @auth(level: USER_ID) {
+  order_insert(data: {
+    restaurantId: $restaurantId,
+    customerId: $customerId,
+    status: $status,
+    totalAmount: $totalAmount,
+    specialInstructions: $specialInstructions
+  })
+}
